@@ -2,30 +2,40 @@
 <html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Moonmour - Astrologia Tecnológica</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
         :root {
-            --glow-color: rgba(255, 255, 255, 0.4);
-            --accent-color: #fff;
-            --bg-color: #121418;
+            --glow-color: rgba(255, 255, 255, 0.2);
+            --bg-color: #080a0f;
+            --glass-bg: rgba(20, 22, 28, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #a0aab5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
         }
 
         body, html {
-            margin: 0;
-            padding: 0;
             width: 100%;
             height: 100%;
             background-color: var(--bg-color);
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* Fundo em Canvas simulando a Topografia 3D */
+        /* --- BACKGROUND CANVAS --- */
         #topo-canvas {
             position: absolute;
             top: 0;
@@ -33,25 +43,26 @@
             width: 100vw;
             height: 100vh;
             z-index: 1;
-            transition: transform 2s ease-in-out;
+            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Estrutura Responsiva da UI */
+        /* --- MAIN UI CONTAINER --- */
         main {
             position: relative;
             z-index: 10;
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 90%;
-            max-width: 500px;
-            transition: transform 2s ease-in-out;
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
         }
 
-        /* Deslocamento do Ecrã para leitura (Desktop vs Mobile) */
+        /* --- RESPONSIVE SHIFTING (DESKTOP VS MOBILE) --- */
         @media (min-width: 768px) {
             .ui-shifted {
-                transform: translateX(-25vw) scale(0.95);
+                transform: translateX(-25vw);
             }
             .bg-shifted {
                 transform: translateX(15vw);
@@ -59,127 +70,228 @@
         }
         @media (max-width: 767px) {
             .ui-shifted {
-                transform: translateY(20vh) scale(0.95);
+                /* Desloca o painel para a base no mobile */
+                transform: translateY(15vh);
             }
             .bg-shifted {
-                transform: translateY(-15vh);
+                /* Sobe a topografia para não ser tapada */
+                transform: translateY(-20vh) scale(0.9);
             }
             main {
-                max-width: 100%;
+                justify-content: flex-end;
+                height: 100vh;
+                padding-bottom: 40px;
             }
         }
 
+        /* --- TYPOGRAPHY --- */
         h1 {
-            font-weight: 300;
-            font-size: clamp(1.5rem, 4vw, 2.2rem);
-            text-shadow: 0 0 15px var(--glow-color);
+            font-weight: 400;
+            font-size: clamp(1.5rem, 5vw, 2rem);
             text-align: center;
             margin-bottom: 2rem;
-            transition: opacity 0.5s ease;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 20px var(--glow-color);
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
 
+        /* --- PREMIUM GLASSMORPHISM PANEL --- */
         .liquid-glass-panel {
-            background: rgba(30, 32, 38, 0.4);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 20px;
-            padding: clamp(20px, 5vw, 35px);
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px) saturate(150%);
+            -webkit-backdrop-filter: blur(24px) saturate(150%);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            padding: clamp(24px, 6vw, 40px);
             width: 100%;
-            box-sizing: border-box;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 20px var(--glow-color);
+            box-shadow: 
+                0 30px 60px rgba(0, 0, 0, 0.6), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 40px var(--glow-color); /* Brilho dinâmico (Rosa/Azul) */
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            transition: box-shadow 1.5s ease, opacity 1.5s ease;
+            gap: 20px;
+            transition: box-shadow 1.5s ease, opacity 1s ease, transform 1s ease;
+        }
+
+        /* --- INPUT STATE --- */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-left: 4px;
         }
 
         input {
-            padding: 14px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.5);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.4);
             color: white;
             font-size: 1rem;
+            font-family: 'Inter', sans-serif;
             outline: none;
-            box-sizing: border-box;
-            width: 100%;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
         }
 
         input:focus {
-            border-color: var(--glow-color);
+            border-color: var(--text-primary);
+            background: rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 15px var(--glow-color);
+        }
+
+        /* Remove default date picker icon background on some browsers */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            opacity: 0.6;
+            cursor: pointer;
         }
 
         button {
             padding: 16px;
-            border-radius: 8px;
+            border-radius: 12px;
             border: none;
-            background: var(--glow-color);
+            background: rgba(255, 255, 255, 0.1);
             color: #fff;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 1rem;
             cursor: pointer;
-            transition: transform 0.2s, background-color 1.5s ease, box-shadow 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            width: 100%;
+            transition: all 0.3s ease;
             margin-top: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         button:hover {
+            background: rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px var(--glow-color);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
 
-        .horoscope-content p {
-            line-height: 1.6;
+        /* --- READING STATE --- */
+        #reading-panel {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .reading-header {
+            margin-bottom: 5px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .reading-header h2 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            letter-spacing: -0.5px;
+        }
+
+        .horoscope-content {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .prediction-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .badge {
+            align-self: flex-start;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 12px;
-            font-size: clamp(0.9rem, 2.5vw, 1rem);
-            color: #d1d5db;
         }
-        
-        .horoscope-content h2 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: clamp(1.3rem, 3vw, 1.8rem);
-            text-shadow: 0 0 10px var(--glow-color);
-            color: #fff;
+
+        /* Tags de Categoria Otimizadas */
+        .tag-cuidado { background: rgba(255, 71, 87, 0.2); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.3); }
+        .tag-fazer { background: rgba(46, 213, 115, 0.2); color: #2ed573; border: 1px solid rgba(46, 213, 115, 0.3); }
+        .tag-naofazer { background: rgba(255, 165, 2, 0.2); color: #ffa502; border: 1px solid rgba(255, 165, 2, 0.3); }
+        .tag-cores { background: rgba(165, 94, 234, 0.2); color: #a55eea; border: 1px solid rgba(165, 94, 234, 0.3); }
+
+        .prediction-item p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
         }
-        
-        .horoscope-content strong {
-            color: #fff;
+
+        .summary {
+            margin-top: 10px;
+            font-style: italic;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.5;
+            text-align: center;
         }
+
     </style>
 </head>
 <body>
 
-    <!-- Fundo de Topografia 3D Animada -->
     <canvas id="topo-canvas"></canvas>
 
     <main id="main-ui">
-        <h1 id="title">O que os astros reservam para si hoje?</h1>
+        <h1 id="title">O que os astros reservam para si?</h1>
         
         <div class="liquid-glass-panel" id="input-panel">
-            <input type="text" id="user-name" placeholder="Introduza o seu nome">
-            <input type="date" id="user-dob">
-            <button onclick="startAstrologyReading()">Consultar Astros</button>
+            <div class="input-group">
+                <label for="user-name">O seu nome</label>
+                <input type="text" id="user-name" placeholder="Ex: Felippe" autocomplete="off">
+            </div>
+            
+            <div class="input-group">
+                <label for="user-dob">Data de nascimento</label>
+                <input type="date" id="user-dob">
+            </div>
+            
+            <button onclick="startAstrologyReading()">Ler Alinhamento</button>
         </div>
 
-        <div class="liquid-glass-panel" id="reading-panel" style="display: none;">
-            <h2>Previsão para <span id="display-name"></span></h2>
+        <div class="liquid-glass-panel" id="reading-panel">
+            <div class="reading-header">
+                <h2>Previsão para <span id="display-name" style="font-weight: 600; color: #fff;"></span></h2>
+            </div>
+            
             <div class="horoscope-content">
-                <p><strong>Cuidado:</strong> Evite decisões impulsivas no ambiente de trabalho hoje.</p>
-                <p><strong>Fazer:</strong> Aproveite a energia de Vénus para se reconectar com velhos amigos.</p>
-                <p><strong>Não Fazer:</strong> Não ignore a sua intuição financeira nas próximas 24h.</p>
-                <p><strong>Cores do Dia:</strong> Prata e Violeta.</p>
-                <p><em>Os astros indicam que hoje é um dia de transição. As órbitas atuais favorecem a clareza mental e a resolução de conflitos passados.</em></p>
+                <div class="prediction-item">
+                    <span class="badge tag-cuidado">Cuidado</span>
+                    <p>Evite decisões impulsivas no ambiente de trabalho hoje.</p>
+                </div>
+                
+                <div class="prediction-item">
+                    <span class="badge tag-fazer">Fazer</span>
+                    <p>Aproveite a energia de Vénus para se reconectar com velhos amigos.</p>
+                </div>
+                
+                <div class="prediction-item">
+                    <span class="badge tag-naofazer">Não Fazer</span>
+                    <p>Não ignore a sua intuição financeira nas próximas 24 horas.</p>
+                </div>
+                
+                <div class="prediction-item">
+                    <span class="badge tag-cores">Cores do Dia</span>
+                    <p>Prata e Violeta.</p>
+                </div>
+                
+                <p class="summary">"Os astros indicam que hoje é um dia de transição. As órbitas atuais favorecem a clareza mental e a resolução de conflitos."</p>
             </div>
         </div>
     </main>
 
     <script>
-        // --- CONFIGURAÇÃO DO CANVAS E TOPOGRAFIA ---
+        // --- CONFIGURAÇÃO DO CANVAS ---
         const canvas = document.getElementById('topo-canvas');
         const ctx = canvas.getContext('2d');
         let width, height;
@@ -191,13 +303,12 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // Dados dos Planetas (Pinos na topografia)
         const planets = [
-            { id: 1, angle: 0.5, speed: 0.002, orbit: 0.9, color: '#a0aab5', yOffset: -10, targetAngle: null },
-            { id: 2, angle: 2.1, speed: 0.003, orbit: 0.7, color: '#ff7f50', yOffset: -40, targetAngle: null },
-            { id: 3, angle: 4.0, speed: 0.004, orbit: 0.5, color: '#87ceeb', yOffset: -80, targetAngle: null },
-            { id: 4, angle: 1.2, speed: 0.005, orbit: 0.3, color: '#ff6347', yOffset: -130, targetAngle: null },
-            { id: 5, angle: 5.5, speed: 0.006, orbit: 0.15, color: '#e0e0e0', yOffset: -170, targetAngle: null }
+            { id: 1, angle: 0.5, speed: 0.0015, orbit: 0.85, color: '#a0aab5', yOffset: -20, targetAngle: null },
+            { id: 2, angle: 2.1, speed: 0.0020, orbit: 0.65, color: '#ff7f50', yOffset: -50, targetAngle: null },
+            { id: 3, angle: 4.0, speed: 0.0025, orbit: 0.45, color: '#87ceeb', yOffset: -90, targetAngle: null },
+            { id: 4, angle: 1.2, speed: 0.0030, orbit: 0.25, color: '#ff6347', yOffset: -140, targetAngle: null },
+            { id: 5, angle: 5.5, speed: 0.0035, orbit: 0.10, color: '#e0e0e0', yOffset: -180, targetAngle: null }
         ];
 
         let isGolden = false;
@@ -206,57 +317,53 @@
             ctx.clearRect(0, 0, width, height);
             ctx.save();
             
-            // Centralizar a perspetiva isómetrica
-            ctx.translate(width / 2, height / 2 + (height > 768 ? 100 : 50)); 
+            // Centralização Dinâmica (Sobe ligeiramente no mobile por defeito para acomodar o teclado/UI)
+            const centerY = height / 2 + (height > 768 ? 50 : -30);
+            ctx.translate(width / 2, centerY); 
             
             const baseRadius = Math.min(width, height) * 0.45;
-            const perspectiveY = 0.35; // Esmagamento para dar efeito 3D
+            const perspectiveY = 0.35; 
 
-            // Desenhar Anel da Bússola (Exterior)
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            // Anel Exterior Escuro
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.ellipse(0, 0, baseRadius, baseRadius * perspectiveY, 0, 0, Math.PI * 2);
             ctx.stroke();
 
-            // Marcadores da Bússola (N, S, E, W)
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-            ctx.font = '12px Arial';
+            // Marcadores Bússola
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.font = '11px Inter';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('N', 0, -baseRadius * perspectiveY - 15);
-            ctx.fillText('S', 0, baseRadius * perspectiveY + 15);
-            ctx.fillText('E', baseRadius + 15, 0);
-            ctx.fillText('W', -baseRadius - 15, 0);
+            ctx.fillText('N', 0, -baseRadius * perspectiveY - 20);
+            ctx.fillText('S', 0, baseRadius * perspectiveY + 20);
+            ctx.fillText('E', baseRadius + 20, 0);
+            ctx.fillText('W', -baseRadius - 20, 0);
 
-            // Desenhar linhas concêntricas da montanha topográfica
-            const contourLevels = 18;
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+            // Linhas de Contorno (Wireframe Cone)
+            const contourLevels = 20;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
             for (let i = 0; i < contourLevels; i++) {
                 const r = baseRadius * (1 - (i / contourLevels) * 0.9);
-                const y = -i * 12; // Altura da montanha
-                
+                const y = -i * 12; 
                 ctx.beginPath();
                 ctx.ellipse(0, y, r, r * perspectiveY, 0, 0, Math.PI * 2);
                 ctx.stroke();
             }
 
-            // Desenhar um caminho tracejado animado (linha guia)
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-            ctx.setLineDash([5, 5]);
-            ctx.lineDashOffset = -Date.now() / 50; // Animação do traço
+            // Eixo Y Central subtil
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
             ctx.beginPath();
-            ctx.moveTo(-baseRadius * 0.8, 0);
-            ctx.quadraticCurveTo(-baseRadius * 0.3, -80, 0, -200);
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, -contourLevels * 12);
             ctx.stroke();
-            ctx.setLineDash([]); // Reset
 
-            // Atualizar e Desenhar Pinos dos Planetas
+            // Renderizar Planetas e Hastes
             planets.forEach(p => {
-                // Interpolação suave para a posição alvo (Alinhamento)
                 if (p.targetAngle !== null) {
                     const diff = p.targetAngle - p.angle;
-                    p.angle += diff * 0.03; 
+                    p.angle += diff * 0.04; 
                 } else {
                     p.angle += p.speed;
                 }
@@ -265,109 +372,114 @@
                 const x = Math.cos(p.angle) * r;
                 const z = Math.sin(p.angle) * r * perspectiveY;
                 
-                const baseY = p.yOffset; // Ponto na montanha
-                const pinHeight = 70;
-                const topY = baseY - pinHeight; // Altura do pino no ar
+                const baseY = p.yOffset; 
+                const pinHeight = 60 + (r * 0.2); // Variação subtil de altura
+                const topY = baseY - pinHeight; 
 
                 const activeColor = isGolden ? '#ffd700' : p.color;
+                const glowIntensity = isGolden ? 'rgba(255, 215, 0, 0.6)' : p.color;
 
-                // Haste do pino
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                // Haste
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
                 ctx.moveTo(x, baseY + z);
                 ctx.lineTo(x, topY + z);
                 ctx.stroke();
 
-                // Base do pino (ponto na topografia)
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                // Base
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
                 ctx.beginPath();
-                ctx.ellipse(x, baseY + z, 3, 3 * perspectiveY, 0, 0, Math.PI * 2);
+                ctx.ellipse(x, baseY + z, 2.5, 2.5 * perspectiveY, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Esfera do Planeta no topo
-                ctx.fillStyle = activeColor;
-                ctx.shadowColor = activeColor;
-                ctx.shadowBlur = 15;
+                // Esfera (Planeta)
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = glowIntensity;
+                ctx.shadowBlur = 20;
                 ctx.beginPath();
-                ctx.arc(x, topY + z, 8, 0, Math.PI * 2);
+                ctx.arc(x, topY + z, 4, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // Detalhe interno da esfera (ponto branco central)
-                ctx.fillStyle = '#ffffff';
-                ctx.shadowBlur = 0;
+                // Halos de Cor
+                ctx.fillStyle = activeColor;
+                ctx.globalAlpha = 0.8;
+                ctx.shadowBlur = 10;
                 ctx.beginPath();
-                ctx.arc(x, topY + z, 3, 0, Math.PI * 2);
+                ctx.arc(x, topY + z, 2.5, 0, Math.PI * 2);
                 ctx.fill();
+                ctx.globalAlpha = 1.0; // Reset
             });
 
             ctx.restore();
             requestAnimationFrame(drawTopography);
         }
 
-        // Iniciar Animação do Canvas
         drawTopography();
 
-        // --- LÓGICA DE INTERAÇÃO DA INTERFACE ---
+        // --- INTERACTION LOGIC ---
         async function startAstrologyReading() {
-            const name = document.getElementById('user-name').value;
+            const name = document.getElementById('user-name').value.trim();
             const dob = document.getElementById('user-dob').value;
 
             if(!name || !dob) {
-                alert("Por favor, preencha o nome e a data de nascimento.");
+                // Shake effect on error (simples feedback visual)
+                const panel = document.getElementById('input-panel');
+                panel.style.transform = 'translateX(-10px)';
+                setTimeout(() => panel.style.transform = 'translateX(10px)', 100);
+                setTimeout(() => panel.style.transform = 'translateX(0)', 200);
                 return;
             }
 
-            // Identificação do Género (Simulação)
-            const isFemale = name.trim().toLowerCase().endsWith('a'); 
-            
+            // Geração da Cor de Brilho Dinâmico
+            const isFemale = name.toLowerCase().endsWith('a'); 
             const root = document.documentElement;
-            if(isFemale) {
-                // Efeito Liquid Glass Rosa para mulheres
-                root.style.setProperty('--glow-color', 'rgba(255, 105, 180, 0.5)');
-            } else {
-                // Efeito Liquid Glass Azul para homens
-                root.style.setProperty('--glow-color', 'rgba(0, 191, 255, 0.5)');
-            }
+            // Tons neon intensos otimizados para fundos escuros
+            const themeColor = isFemale ? 'rgba(255, 41, 117, 0.25)' : 'rgba(0, 168, 255, 0.25)';
+            root.style.setProperty('--glow-color', themeColor);
 
-            // Fase 1: Nascimento (Planetas ficam dourados e alinham-se bruscamente)
+            // Fase 1: Nascimento (Alinhamento e Cor Dourada)
             isGolden = true;
             planets.forEach(p => {
-                p.targetAngle = p.angle + Math.PI * (Math.random() * 2); // Alvo aleatório (Nascimento)
+                p.targetAngle = p.angle + (Math.PI * 1.5); 
             });
 
-            // Fase 2: Alinhamento Atual e Exibição do Horóscopo
+            // Ocultar Título
+            const title = document.getElementById('title');
+            title.style.transform = 'translateY(-20px)';
+            title.style.opacity = '0';
+
+            // Fase 2: Mostrar Resultados
             setTimeout(() => {
-                // Deslocar a interface e o fundo
                 document.getElementById('main-ui').classList.add('ui-shifted');
                 document.getElementById('topo-canvas').classList.add('bg-shifted');
 
-                // Planetas voltam à cor normal e alinham-se para a configuração "Atual"
                 isGolden = false;
                 planets.forEach(p => {
-                    p.targetAngle = p.angle + Math.PI; // Novo alinhamento
+                    p.targetAngle = p.angle + Math.PI; 
                 });
 
-                // Transição da UI (Esconder inputs, mostrar resultados)
-                const title = document.getElementById('title');
-                title.style.opacity = '0';
+                title.style.display = 'none';
+                
+                const inputPanel = document.getElementById('input-panel');
+                inputPanel.style.opacity = '0';
+                inputPanel.style.transform = 'scale(0.95)';
                 
                 setTimeout(() => {
-                   title.style.display = 'none';
-                   document.getElementById('input-panel').style.display = 'none';
-                   
-                   const readingPanel = document.getElementById('reading-panel');
-                   document.getElementById('display-name').innerText = name;
-                   readingPanel.style.display = 'flex';
-                   readingPanel.style.opacity = 0;
-                   
-                   // Fade in suave do resultado
-                   setTimeout(() => {
-                       readingPanel.style.opacity = 1;
-                   }, 300);
-                }, 500);
+                    inputPanel.style.display = 'none';
+                    
+                    const readingPanel = document.getElementById('reading-panel');
+                    document.getElementById('display-name').innerText = name.charAt(0).toUpperCase() + name.slice(1);
+                    
+                    readingPanel.style.display = 'flex';
+                    // Disparo do Reflow
+                    void readingPanel.offsetWidth; 
+                    
+                    readingPanel.style.opacity = '1';
+                    readingPanel.style.transform = 'translateY(0)';
+                }, 400);
 
-            }, 2500); // Duração da fase "Dourada de Nascimento"
+            }, 2000); 
         }
     </script>
 </body>
