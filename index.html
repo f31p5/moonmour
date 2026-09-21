@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonmour - Astrologia Tecnológica</title>
+    <style>
+        :root {
+            --glow-color: rgba(255, 255, 255, 0.4);
+            --accent-color: #fff;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: #050510;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #universe-bg {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            z-index: 1;
+            transition: all 2s ease-in-out;
+        }
+
+        .sun {
+            position: absolute;
+            top: -50px;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, #ffd700, #ff8c00);
+            border-radius: 50%;
+            box-shadow: 0 0 100px #ff8c00;
+        }
+
+        .orbit {
+            position: absolute;
+            top: 25px;
+            width: var(--orbit-size);
+            height: var(--orbit-size);
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: spin var(--speed) linear infinite;
+            transition: all 2s ease-in-out;
+        }
+
+        .planet {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: absolute;
+            top: -10px;
+            left: calc(50% - 10px);
+            box-shadow: 0 0 15px currentColor;
+            transition: background-color 1.5s, box-shadow 1.5s;
+        }
+
+        .golden-planet .planet {
+            background: #ffd700 !important;
+            box-shadow: 0 0 25px #ffd700, 0 0 50px #ffaa00 !important;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        main {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 2s ease-in-out;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .ui-shifted {
+            transform: translateX(-25vw) scale(0.9);
+        }
+
+        .bg-shifted {
+            transform: translateX(20vw) scale(0.8);
+        }
+
+        h1 {
+            font-weight: 300;
+            text-shadow: 0 0 10px var(--glow-color);
+            text-align: center;
+            margin-bottom: 2rem;
+            transition: opacity 0.5s ease;
+        }
+
+        .liquid-glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 8px 32px 0 var(--glow-color), inset 0 0 20px rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transition: box-shadow 1s ease, opacity 1.5s ease;
+        }
+
+        input {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            background: var(--glow-color);
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 1s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+        }
+
+        .horoscope-content p {
+            line-height: 1.6;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+        
+        .horoscope-content h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-shadow: 0 0 5px var(--glow-color);
+        }
+    </style>
+</head>
+<body>
+    <div id="universe-bg">
+        <div class="sun"></div>
+        <div class="orbit" style="--orbit-size: 300px; --speed: 10s;"><div class="planet" style="background: #a9805d;"></div></div>
+        <div class="orbit" style="--orbit-size: 450px; --speed: 15s;"><div class="planet" style="background: #e2a65a;"></div></div>
+        <div class="orbit" style="--orbit-size: 600px; --speed: 20s;"><div class="planet" style="background: #4b88a2;"></div></div>
+    </div>
+
+    <main id="main-ui">
+        <h1 id="title">O que os astros reservam para você hoje?</h1>
+        
+        <div class="liquid-glass-panel" id="input-panel">
+            <input type="text" id="user-name" placeholder="Digite o seu nome">
+            <input type="date" id="user-dob">
+            <button onclick="startAstrologyReading()">Consultar Astros</button>
+        </div>
+
+        <div class="liquid-glass-panel" id="reading-panel" style="display: none;">
+            <h2>Previsão para <span id="display-name"></span></h2>
+            <div class="horoscope-content">
+                <p><strong>Cuidado:</strong> Evite decisões impulsivas no ambiente de trabalho hoje.</p>
+                <p><strong>Fazer:</strong> Aproveite a energia de Vénus para se reconetar com velhos amigos.</p>
+                <p><strong>Não Fazer:</strong> Não ignore a sua intuição financeira nas próximas 24h.</p>
+                <p><strong>Cores do Dia:</strong> Prata e Violeta.</p>
+                <p><em>Os astros indicam que hoje é um dia de transição. As órbitas atuais favorecem a clareza mental e a resolução de conflitos passados.</em></p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function startAstrologyReading() {
+            const name = document.getElementById('user-name').value;
+            const dob = document.getElementById('user-dob').value;
+
+            if(!name || !dob) {
+                alert("Por favor, preencha o nome e a data de nascimento.");
+                return;
+            }
+
+            const isFemale = name.toLowerCase().endsWith('a'); 
+            
+            const root = document.documentElement;
+            if(isFemale) {
+                root.style.setProperty('--glow-color', 'rgba(255, 105, 180, 0.6)');
+            } else {
+                root.style.setProperty('--glow-color', 'rgba(0, 191, 255, 0.6)');
+            }
+
+            const orbits = document.querySelectorAll('.orbit');
+            document.getElementById('universe-bg').classList.add('golden-planet');
+            
+            orbits.forEach(orbit => {
+                orbit.style.animation = 'none';
+                const randomBirthAngle = Math.floor(Math.random() * 360);
+                orbit.style.transform = `rotate(${randomBirthAngle}deg)`;
+            });
+
+            setTimeout(() => {
+                document.getElementById('main-ui').classList.add('ui-shifted');
+                document.getElementById('universe-bg').classList.add('bg-shifted');
+
+                orbits.forEach(orbit => {
+                    const currentAngle = Math.floor(Math.random() * 360);
+                    orbit.style.transform = `rotate(${currentAngle}deg)`;
+                });
+
+                document.getElementById('title').style.opacity = '0';
+                setTimeout(() => {
+                   document.getElementById('title').style.display = 'none';
+                }, 500);
+                
+                document.getElementById('input-panel').style.display = 'none';
+                
+                const readingPanel = document.getElementById('reading-panel');
+                document.getElementById('display-name').innerText = name;
+                readingPanel.style.display = 'flex';
+                readingPanel.style.opacity = 0;
+                
+                setTimeout(() => {
+                    readingPanel.style.opacity = 1;
+                }, 500);
+
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
