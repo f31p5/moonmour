@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,14 +8,15 @@
         :root {
             --glow-color: rgba(255, 255, 255, 0.4);
             --accent-color: #fff;
+            --bg-color: #121418;
         }
 
         body, html {
             margin: 0;
             padding: 0;
             width: 100%;
-            height: 100vh;
-            background-color: #050510;
+            height: 100%;
+            background-color: var(--bg-color);
             color: white;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
@@ -24,155 +25,143 @@
             align-items: center;
         }
 
-        #universe-bg {
+        /* Fundo em Canvas simulando a Topografia 3D */
+        #topo-canvas {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             z-index: 1;
-            transition: all 2s ease-in-out;
+            transition: transform 2s ease-in-out;
         }
 
-        .sun {
-            position: absolute;
-            top: -50px;
-            width: 150px;
-            height: 150px;
-            background: radial-gradient(circle, #ffd700, #ff8c00);
-            border-radius: 50%;
-            box-shadow: 0 0 100px #ff8c00;
-        }
-
-        .orbit {
-            position: absolute;
-            top: 25px;
-            width: var(--orbit-size);
-            height: var(--orbit-size);
-            border: 1px dashed rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            animation: spin var(--speed) linear infinite;
-            transition: all 2s ease-in-out;
-        }
-
-        .planet {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            position: absolute;
-            top: -10px;
-            left: calc(50% - 10px);
-            box-shadow: 0 0 15px currentColor;
-            transition: background-color 1.5s, box-shadow 1.5s;
-        }
-
-        .golden-planet .planet {
-            background: #ffd700 !important;
-            box-shadow: 0 0 25px #ffd700, 0 0 50px #ffaa00 !important;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
+        /* Estrutura Responsiva da UI */
         main {
             position: relative;
             z-index: 10;
             display: flex;
             flex-direction: column;
             align-items: center;
+            width: 90%;
+            max-width: 500px;
             transition: transform 2s ease-in-out;
-            width: 100%;
-            max-width: 600px;
         }
 
-        .ui-shifted {
-            transform: translateX(-25vw) scale(0.9);
+        /* Deslocamento do Ecrã para leitura (Desktop vs Mobile) */
+        @media (min-width: 768px) {
+            .ui-shifted {
+                transform: translateX(-25vw) scale(0.95);
+            }
+            .bg-shifted {
+                transform: translateX(15vw);
+            }
         }
-
-        .bg-shifted {
-            transform: translateX(20vw) scale(0.8);
+        @media (max-width: 767px) {
+            .ui-shifted {
+                transform: translateY(20vh) scale(0.95);
+            }
+            .bg-shifted {
+                transform: translateY(-15vh);
+            }
+            main {
+                max-width: 100%;
+            }
         }
 
         h1 {
             font-weight: 300;
-            text-shadow: 0 0 10px var(--glow-color);
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            text-shadow: 0 0 15px var(--glow-color);
             text-align: center;
             margin-bottom: 2rem;
             transition: opacity 0.5s ease;
         }
 
         .liquid-glass-panel {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(30, 32, 38, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 20px;
-            padding: 30px;
+            padding: clamp(20px, 5vw, 35px);
             width: 100%;
             box-sizing: border-box;
-            box-shadow: 0 8px 32px 0 var(--glow-color), inset 0 0 20px rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 20px var(--glow-color);
             display: flex;
             flex-direction: column;
             gap: 15px;
-            transition: box-shadow 1s ease, opacity 1.5s ease;
+            transition: box-shadow 1.5s ease, opacity 1.5s ease;
         }
 
         input {
-            padding: 12px;
+            padding: 14px;
             border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.5);
             color: white;
             font-size: 1rem;
             outline: none;
             box-sizing: border-box;
+            width: 100%;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--glow-color);
         }
 
         button {
-            padding: 15px;
+            padding: 16px;
             border-radius: 8px;
             border: none;
             background: var(--glow-color);
             color: #fff;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s, background-color 1s ease;
+            transition: transform 0.2s, background-color 1.5s ease, box-shadow 0.3s;
             text-transform: uppercase;
             letter-spacing: 2px;
+            width: 100%;
+            margin-top: 10px;
         }
 
         button:hover {
-            transform: scale(1.02);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--glow-color);
         }
 
         .horoscope-content p {
             line-height: 1.6;
             letter-spacing: 0.5px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            color: #d1d5db;
         }
         
         .horoscope-content h2 {
             margin-top: 0;
             margin-bottom: 20px;
-            text-shadow: 0 0 5px var(--glow-color);
+            font-size: clamp(1.3rem, 3vw, 1.8rem);
+            text-shadow: 0 0 10px var(--glow-color);
+            color: #fff;
+        }
+        
+        .horoscope-content strong {
+            color: #fff;
         }
     </style>
 </head>
 <body>
-    <div id="universe-bg">
-        <div class="sun"></div>
-        <div class="orbit" style="--orbit-size: 300px; --speed: 10s;"><div class="planet" style="background: #a9805d;"></div></div>
-        <div class="orbit" style="--orbit-size: 450px; --speed: 15s;"><div class="planet" style="background: #e2a65a;"></div></div>
-        <div class="orbit" style="--orbit-size: 600px; --speed: 20s;"><div class="planet" style="background: #4b88a2;"></div></div>
-    </div>
+
+    <!-- Fundo de Topografia 3D Animada -->
+    <canvas id="topo-canvas"></canvas>
 
     <main id="main-ui">
-        <h1 id="title">O que os astros reservam para você hoje?</h1>
+        <h1 id="title">O que os astros reservam para si hoje?</h1>
         
         <div class="liquid-glass-panel" id="input-panel">
-            <input type="text" id="user-name" placeholder="Digite o seu nome">
+            <input type="text" id="user-name" placeholder="Introduza o seu nome">
             <input type="date" id="user-dob">
             <button onclick="startAstrologyReading()">Consultar Astros</button>
         </div>
@@ -181,7 +170,7 @@
             <h2>Previsão para <span id="display-name"></span></h2>
             <div class="horoscope-content">
                 <p><strong>Cuidado:</strong> Evite decisões impulsivas no ambiente de trabalho hoje.</p>
-                <p><strong>Fazer:</strong> Aproveite a energia de Vénus para se reconetar com velhos amigos.</p>
+                <p><strong>Fazer:</strong> Aproveite a energia de Vénus para se reconectar com velhos amigos.</p>
                 <p><strong>Não Fazer:</strong> Não ignore a sua intuição financeira nas próximas 24h.</p>
                 <p><strong>Cores do Dia:</strong> Prata e Violeta.</p>
                 <p><em>Os astros indicam que hoje é um dia de transição. As órbitas atuais favorecem a clareza mental e a resolução de conflitos passados.</em></p>
@@ -190,6 +179,136 @@
     </main>
 
     <script>
+        // --- CONFIGURAÇÃO DO CANVAS E TOPOGRAFIA ---
+        const canvas = document.getElementById('topo-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Dados dos Planetas (Pinos na topografia)
+        const planets = [
+            { id: 1, angle: 0.5, speed: 0.002, orbit: 0.9, color: '#a0aab5', yOffset: -10, targetAngle: null },
+            { id: 2, angle: 2.1, speed: 0.003, orbit: 0.7, color: '#ff7f50', yOffset: -40, targetAngle: null },
+            { id: 3, angle: 4.0, speed: 0.004, orbit: 0.5, color: '#87ceeb', yOffset: -80, targetAngle: null },
+            { id: 4, angle: 1.2, speed: 0.005, orbit: 0.3, color: '#ff6347', yOffset: -130, targetAngle: null },
+            { id: 5, angle: 5.5, speed: 0.006, orbit: 0.15, color: '#e0e0e0', yOffset: -170, targetAngle: null }
+        ];
+
+        let isGolden = false;
+
+        function drawTopography() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.save();
+            
+            // Centralizar a perspetiva isómetrica
+            ctx.translate(width / 2, height / 2 + (height > 768 ? 100 : 50)); 
+            
+            const baseRadius = Math.min(width, height) * 0.45;
+            const perspectiveY = 0.35; // Esmagamento para dar efeito 3D
+
+            // Desenhar Anel da Bússola (Exterior)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, baseRadius, baseRadius * perspectiveY, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Marcadores da Bússola (N, S, E, W)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('N', 0, -baseRadius * perspectiveY - 15);
+            ctx.fillText('S', 0, baseRadius * perspectiveY + 15);
+            ctx.fillText('E', baseRadius + 15, 0);
+            ctx.fillText('W', -baseRadius - 15, 0);
+
+            // Desenhar linhas concêntricas da montanha topográfica
+            const contourLevels = 18;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+            for (let i = 0; i < contourLevels; i++) {
+                const r = baseRadius * (1 - (i / contourLevels) * 0.9);
+                const y = -i * 12; // Altura da montanha
+                
+                ctx.beginPath();
+                ctx.ellipse(0, y, r, r * perspectiveY, 0, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Desenhar um caminho tracejado animado (linha guia)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.setLineDash([5, 5]);
+            ctx.lineDashOffset = -Date.now() / 50; // Animação do traço
+            ctx.beginPath();
+            ctx.moveTo(-baseRadius * 0.8, 0);
+            ctx.quadraticCurveTo(-baseRadius * 0.3, -80, 0, -200);
+            ctx.stroke();
+            ctx.setLineDash([]); // Reset
+
+            // Atualizar e Desenhar Pinos dos Planetas
+            planets.forEach(p => {
+                // Interpolação suave para a posição alvo (Alinhamento)
+                if (p.targetAngle !== null) {
+                    const diff = p.targetAngle - p.angle;
+                    p.angle += diff * 0.03; 
+                } else {
+                    p.angle += p.speed;
+                }
+
+                const r = baseRadius * p.orbit;
+                const x = Math.cos(p.angle) * r;
+                const z = Math.sin(p.angle) * r * perspectiveY;
+                
+                const baseY = p.yOffset; // Ponto na montanha
+                const pinHeight = 70;
+                const topY = baseY - pinHeight; // Altura do pino no ar
+
+                const activeColor = isGolden ? '#ffd700' : p.color;
+
+                // Haste do pino
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(x, baseY + z);
+                ctx.lineTo(x, topY + z);
+                ctx.stroke();
+
+                // Base do pino (ponto na topografia)
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.beginPath();
+                ctx.ellipse(x, baseY + z, 3, 3 * perspectiveY, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Esfera do Planeta no topo
+                ctx.fillStyle = activeColor;
+                ctx.shadowColor = activeColor;
+                ctx.shadowBlur = 15;
+                ctx.beginPath();
+                ctx.arc(x, topY + z, 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Detalhe interno da esfera (ponto branco central)
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowBlur = 0;
+                ctx.beginPath();
+                ctx.arc(x, topY + z, 3, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.restore();
+            requestAnimationFrame(drawTopography);
+        }
+
+        // Iniciar Animação do Canvas
+        drawTopography();
+
+        // --- LÓGICA DE INTERAÇÃO DA INTERFACE ---
         async function startAstrologyReading() {
             const name = document.getElementById('user-name').value;
             const dob = document.getElementById('user-dob').value;
@@ -199,50 +318,56 @@
                 return;
             }
 
-            const isFemale = name.toLowerCase().endsWith('a'); 
+            // Identificação do Género (Simulação)
+            const isFemale = name.trim().toLowerCase().endsWith('a'); 
             
             const root = document.documentElement;
             if(isFemale) {
-                root.style.setProperty('--glow-color', 'rgba(255, 105, 180, 0.6)');
+                // Efeito Liquid Glass Rosa para mulheres
+                root.style.setProperty('--glow-color', 'rgba(255, 105, 180, 0.5)');
             } else {
-                root.style.setProperty('--glow-color', 'rgba(0, 191, 255, 0.6)');
+                // Efeito Liquid Glass Azul para homens
+                root.style.setProperty('--glow-color', 'rgba(0, 191, 255, 0.5)');
             }
 
-            const orbits = document.querySelectorAll('.orbit');
-            document.getElementById('universe-bg').classList.add('golden-planet');
-            
-            orbits.forEach(orbit => {
-                orbit.style.animation = 'none';
-                const randomBirthAngle = Math.floor(Math.random() * 360);
-                orbit.style.transform = `rotate(${randomBirthAngle}deg)`;
+            // Fase 1: Nascimento (Planetas ficam dourados e alinham-se bruscamente)
+            isGolden = true;
+            planets.forEach(p => {
+                p.targetAngle = p.angle + Math.PI * (Math.random() * 2); // Alvo aleatório (Nascimento)
             });
 
+            // Fase 2: Alinhamento Atual e Exibição do Horóscopo
             setTimeout(() => {
+                // Deslocar a interface e o fundo
                 document.getElementById('main-ui').classList.add('ui-shifted');
-                document.getElementById('universe-bg').classList.add('bg-shifted');
+                document.getElementById('topo-canvas').classList.add('bg-shifted');
 
-                orbits.forEach(orbit => {
-                    const currentAngle = Math.floor(Math.random() * 360);
-                    orbit.style.transform = `rotate(${currentAngle}deg)`;
+                // Planetas voltam à cor normal e alinham-se para a configuração "Atual"
+                isGolden = false;
+                planets.forEach(p => {
+                    p.targetAngle = p.angle + Math.PI; // Novo alinhamento
                 });
 
-                document.getElementById('title').style.opacity = '0';
-                setTimeout(() => {
-                   document.getElementById('title').style.display = 'none';
-                }, 500);
-                
-                document.getElementById('input-panel').style.display = 'none';
-                
-                const readingPanel = document.getElementById('reading-panel');
-                document.getElementById('display-name').innerText = name;
-                readingPanel.style.display = 'flex';
-                readingPanel.style.opacity = 0;
+                // Transição da UI (Esconder inputs, mostrar resultados)
+                const title = document.getElementById('title');
+                title.style.opacity = '0';
                 
                 setTimeout(() => {
-                    readingPanel.style.opacity = 1;
+                   title.style.display = 'none';
+                   document.getElementById('input-panel').style.display = 'none';
+                   
+                   const readingPanel = document.getElementById('reading-panel');
+                   document.getElementById('display-name').innerText = name;
+                   readingPanel.style.display = 'flex';
+                   readingPanel.style.opacity = 0;
+                   
+                   // Fade in suave do resultado
+                   setTimeout(() => {
+                       readingPanel.style.opacity = 1;
+                   }, 300);
                 }, 500);
 
-            }, 2500);
+            }, 2500); // Duração da fase "Dourada de Nascimento"
         }
     </script>
 </body>
