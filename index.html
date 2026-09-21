@@ -3,239 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Moonmour - Astrologia Tecnológica</title>
+    <title>Moonmour - Astrologia Tecnológica & Topografia Orbital</title>
+    
+    <!-- Biblioteca Científica para Cálculo Astronómico em Tempo Real -->
+    <script src="https://unpkg.com/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 
         :root {
             --glow-color: rgba(255, 255, 255, 0.2);
-            --bg-color: #080a0f;
-            --glass-bg: rgba(20, 22, 28, 0.6);
+            --bg-color: #151618; /* Cor de fundo exata da imagem de referência */
+            --glass-bg: rgba(21, 22, 24, 0.65);
             --glass-border: rgba(255, 255, 255, 0.08);
             --text-primary: #ffffff;
             --text-secondary: #a0aab5;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-font-smoothing: antialiased;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
 
         body, html {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             background-color: var(--bg-color);
             color: var(--text-primary);
             font-family: 'Inter', sans-serif;
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
         }
 
-        /* --- BACKGROUND CANVAS --- */
+        /* O Canvas será o foco absoluto do background */
         #topo-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 1;
-            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 1; transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* --- MAIN UI CONTAINER --- */
         main {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            max-width: 480px;
-            padding: 20px;
+            position: relative; z-index: 10;
+            display: flex; flex-direction: column; align-items: center;
+            width: 100%; max-width: 500px; padding: 20px;
             transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
         }
 
-        /* --- RESPONSIVE SHIFTING (DESKTOP VS MOBILE) --- */
+        /* Responsividade e deslocamento da UI sem tapar a montanha central */
         @media (min-width: 768px) {
-            .ui-shifted {
-                transform: translateX(-25vw);
-            }
-            .bg-shifted {
-                transform: translateX(15vw);
-            }
+            .ui-shifted { transform: translateX(-25vw); }
+            .bg-shifted { transform: translateX(15vw); }
         }
         @media (max-width: 767px) {
-            .ui-shifted {
-                /* Desloca o painel para a base no mobile */
-                transform: translateY(15vh);
-            }
-            .bg-shifted {
-                /* Sobe a topografia para não ser tapada */
-                transform: translateY(-20vh) scale(0.9);
-            }
-            main {
-                justify-content: flex-end;
-                height: 100vh;
-                padding-bottom: 40px;
-            }
+            .ui-shifted { transform: translateY(5vh); }
+            .bg-shifted { transform: translateY(-20vh) scale(0.9); }
+            main { justify-content: flex-end; height: 100vh; padding-bottom: 20px; max-width: 100%; }
         }
 
-        /* --- TYPOGRAPHY --- */
         h1 {
-            font-weight: 400;
-            font-size: clamp(1.5rem, 5vw, 2rem);
-            text-align: center;
-            margin-bottom: 2rem;
-            letter-spacing: -0.5px;
-            text-shadow: 0 0 20px var(--glow-color);
+            font-weight: 400; font-size: clamp(1.5rem, 5vw, 2rem); text-align: center;
+            margin-bottom: 2rem; letter-spacing: -0.5px; text-shadow: 0 0 20px var(--glow-color);
             transition: opacity 0.5s ease, transform 0.5s ease;
         }
 
-        /* --- PREMIUM GLASSMORPHISM PANEL --- */
         .liquid-glass-panel {
             background: var(--glass-bg);
-            backdrop-filter: blur(24px) saturate(150%);
-            -webkit-backdrop-filter: blur(24px) saturate(150%);
-            border: 1px solid var(--glass-border);
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 24px;
-            padding: clamp(24px, 6vw, 40px);
-            width: 100%;
-            box-shadow: 
-                0 30px 60px rgba(0, 0, 0, 0.6), 
-                inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                0 0 40px var(--glow-color); /* Brilho dinâmico (Rosa/Azul) */
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            backdrop-filter: blur(16px) saturate(120%); -webkit-backdrop-filter: blur(16px) saturate(120%);
+            border: 1px solid var(--glass-border); border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px; padding: clamp(20px, 5vw, 30px); width: 100%;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 40px var(--glow-color);
+            display: flex; flex-direction: column; gap: 15px;
             transition: box-shadow 1.5s ease, opacity 1s ease, transform 1s ease;
+            max-height: 80vh; overflow-y: auto;
         }
+        
+        .liquid-glass-panel::-webkit-scrollbar { width: 4px; }
+        .liquid-glass-panel::-webkit-scrollbar-track { background: transparent; }
+        .liquid-glass-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
-        /* --- INPUT STATE --- */
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .input-group label {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-left: 4px;
-        }
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        .input-group label { font-size: 0.85rem; color: var(--text-secondary); margin-left: 4px; }
 
         input {
-            padding: 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.4);
-            color: white;
-            font-size: 1rem;
-            font-family: 'Inter', sans-serif;
-            outline: none;
-            transition: all 0.3s ease;
+            padding: 14px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.5); color: white; font-size: 1rem;
+            font-family: 'Inter', sans-serif; outline: none; transition: all 0.3s ease;
         }
-
-        input:focus {
-            border-color: var(--text-primary);
-            background: rgba(0, 0, 0, 0.6);
-            box-shadow: 0 0 15px var(--glow-color);
-        }
-
-        /* Remove default date picker icon background on some browsers */
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            opacity: 0.6;
-            cursor: pointer;
-        }
+        input:focus { border-color: var(--text-primary); background: rgba(0, 0, 0, 0.7); box-shadow: 0 0 15px var(--glow-color); }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; cursor: pointer; }
 
         button {
-            padding: 16px;
-            border-radius: 12px;
-            border: none;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 16px; border-radius: 12px; border: none; background: rgba(255, 255, 255, 0.1);
+            color: #fff; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s ease;
+            margin-top: 5px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);
         }
+        button:hover:not(:disabled) { background: rgba(255, 255, 255, 0.2); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        button:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
-
-        /* --- READING STATE --- */
-        #reading-panel {
-            display: none;
-            opacity: 0;
-            transform: translateY(20px);
-        }
+        #reading-panel { display: none; opacity: 0; transform: translateY(20px); gap: 10px; }
 
         .reading-header {
-            margin-bottom: 5px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 5px; padding-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .reading-header h2 { font-size: 1.2rem; font-weight: 500; letter-spacing: -0.5px; }
+        
+        .sign-badge {
+            background: rgba(255, 255, 255, 0.1); padding: 4px 10px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 600; border: 1px solid var(--glow-color);
         }
 
-        .reading-header h2 {
-            font-size: 1.5rem;
-            font-weight: 500;
-            letter-spacing: -0.5px;
+        .prediction-item { display: flex; flex-direction: column; gap: 6px; }
+        .badge { align-self: flex-start; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+        .tag-leitura { background: rgba(0, 168, 255, 0.15); color: #00a8ff; border: 1px solid rgba(0, 168, 255, 0.3); }
+        .tag-astros { background: rgba(255, 165, 2, 0.15); color: #ffa502; border: 1px solid rgba(255, 165, 2, 0.3); }
+
+        .api-text { font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary); }
+
+        .astro-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; margin-top: 5px; }
+        .astro-card {
+            background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 8px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
         }
+        .astro-card .planet-name { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .astro-card .planet-sign { font-size: 0.85rem; font-weight: 600; color: #fff; }
 
-        .horoscope-content {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .prediction-item {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .badge {
-            align-self: flex-start;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Tags de Categoria Otimizadas */
-        .tag-cuidado { background: rgba(255, 71, 87, 0.2); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.3); }
-        .tag-fazer { background: rgba(46, 213, 115, 0.2); color: #2ed573; border: 1px solid rgba(46, 213, 115, 0.3); }
-        .tag-naofazer { background: rgba(255, 165, 2, 0.2); color: #ffa502; border: 1px solid rgba(255, 165, 2, 0.3); }
-        .tag-cores { background: rgba(165, 94, 234, 0.2); color: #a55eea; border: 1px solid rgba(165, 94, 234, 0.3); }
-
-        .prediction-item p {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: var(--text-secondary);
-        }
-
-        .summary {
-            margin-top: 10px;
-            font-style: italic;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.6);
-            line-height: 1.5;
-            text-align: center;
-        }
-
+        .summary { margin-top: 5px; font-style: italic; font-size: 0.8rem; color: rgba(255, 255, 255, 0.4); text-align: center; }
     </style>
 </head>
 <body>
@@ -250,48 +138,32 @@
                 <label for="user-name">O seu nome</label>
                 <input type="text" id="user-name" placeholder="Ex: Felippe" autocomplete="off">
             </div>
-            
             <div class="input-group">
                 <label for="user-dob">Data de nascimento</label>
                 <input type="date" id="user-dob">
             </div>
-            
-            <button onclick="startAstrologyReading()">Ler Alinhamento</button>
+            <button id="submit-btn" onclick="startAstrologyReading()">Ler Alinhamento</button>
         </div>
 
         <div class="liquid-glass-panel" id="reading-panel">
             <div class="reading-header">
-                <h2>Previsão para <span id="display-name" style="font-weight: 600; color: #fff;"></span></h2>
+                <h2>Previsão de <span id="display-name" style="font-weight: 600; color: #fff;"></span></h2>
+                <span class="sign-badge" id="display-sign">Signo</span>
             </div>
-            
-            <div class="horoscope-content">
-                <div class="prediction-item">
-                    <span class="badge tag-cuidado">Cuidado</span>
-                    <p>Evite decisões impulsivas no ambiente de trabalho hoje.</p>
-                </div>
-                
-                <div class="prediction-item">
-                    <span class="badge tag-fazer">Fazer</span>
-                    <p>Aproveite a energia de Vénus para se reconectar com velhos amigos.</p>
-                </div>
-                
-                <div class="prediction-item">
-                    <span class="badge tag-naofazer">Não Fazer</span>
-                    <p>Não ignore a sua intuição financeira nas próximas 24 horas.</p>
-                </div>
-                
-                <div class="prediction-item">
-                    <span class="badge tag-cores">Cores do Dia</span>
-                    <p>Prata e Violeta.</p>
-                </div>
-                
-                <p class="summary">"Os astros indicam que hoje é um dia de transição. As órbitas atuais favorecem a clareza mental e a resolução de conflitos."</p>
+            <div class="prediction-item">
+                <span class="badge tag-leitura">Leitura Diária</span>
+                <p class="api-text" id="api-horoscope-text">A ler o alinhamento orbital...</p>
             </div>
+            <div class="prediction-item" style="margin-top: 5px;">
+                <span class="badge tag-astros">Alinhamento Orbital Real (Agora)</span>
+                <div class="astro-grid" id="astro-grid-container"></div>
+            </div>
+            <p class="summary">Leitura baseada nas posições astronómicas e matemáticas atuais.</p>
         </div>
     </main>
 
     <script>
-        // --- CONFIGURAÇÃO DO CANVAS ---
+        // --- 1. CONFIGURAÇÃO DO CANVAS E MATEMÁTICA TOPOGRÁFICA ---
         const canvas = document.getElementById('topo-canvas');
         const ctx = canvas.getContext('2d');
         let width, height;
@@ -303,177 +175,312 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        const planets = [
-            { id: 1, angle: 0.5, speed: 0.0015, orbit: 0.85, color: '#a0aab5', yOffset: -20, targetAngle: null },
-            { id: 2, angle: 2.1, speed: 0.0020, orbit: 0.65, color: '#ff7f50', yOffset: -50, targetAngle: null },
-            { id: 3, angle: 4.0, speed: 0.0025, orbit: 0.45, color: '#87ceeb', yOffset: -90, targetAngle: null },
-            { id: 4, angle: 1.2, speed: 0.0030, orbit: 0.25, color: '#ff6347', yOffset: -140, targetAngle: null },
-            { id: 5, angle: 5.5, speed: 0.0035, orbit: 0.10, color: '#e0e0e0', yOffset: -180, targetAngle: null }
+        // Parâmetros Isométricos e de Escala
+        const PERSPECTIVE = 0.45; // Esmagamento no eixo Y (isométrico)
+        const MOUNTAIN_HEIGHT = 180;
+        let globalTime = 0;
+
+        // Função Matemática de Elevação da Montanha (Cria os picos e vales fidedignos à imagem)
+        function getElevation(x, y, maxRadius) {
+            let dist = Math.sqrt(x*x + y*y);
+            if (dist > maxRadius) return 0;
+            
+            // Curva base da montanha (Gaussiana suave)
+            let normalized = dist / maxRadius;
+            let baseZ = Math.cos(normalized * Math.PI / 2) * MOUNTAIN_HEIGHT;
+            
+            // Adicionar ruído orgânico para criar os sulcos (como na imagem)
+            let angle = Math.atan2(y, x);
+            let ridge = Math.sin(angle * 3) * 15 * (1 - normalized); // 3 cordilheiras
+            let secondaryPeak = Math.cos(angle * 5 + 1) * 8 * (1 - normalized);
+            
+            let z = baseZ + ridge + secondaryPeak;
+            return z < 0 ? 0 : z;
+        }
+
+        // Definição dos Planetas com Cores/Gradientes Estilo NASA
+        let planets = [
+            { name: 'Mercúrio', orbitR: 0.15, angle: 0.5, speed: 0.003, colorStops: ['#b0b0b0', '#505050'], targetAngle: null, currentZ: 0 },
+            { name: 'Vénus',    orbitR: 0.35, angle: 2.1, speed: 0.002, colorStops: ['#ffe0b2', '#d4a373'], targetAngle: null, currentZ: 0 },
+            { name: 'Terra',    orbitR: 0.55, angle: 4.0, speed: 0.0015, colorStops: ['#42a5f5', '#1e88e5'], targetAngle: null, currentZ: 0 },
+            { name: 'Marte',    orbitR: 0.75, angle: 1.2, speed: 0.001, colorStops: ['#ff7043', '#d84315'], targetAngle: null, currentZ: 0 },
+            { name: 'Júpiter',  orbitR: 0.90, angle: 5.5, speed: 0.0005, colorStops: ['#ffcc80', '#a1887f'], targetAngle: null, currentZ: 0 }
         ];
 
         let isGolden = false;
 
+        // Renderização Fidedigna ao Frame (Painter's Algorithm Básico)
         function drawTopography() {
             ctx.clearRect(0, 0, width, height);
             ctx.save();
             
-            // Centralização Dinâmica (Sobe ligeiramente no mobile por defeito para acomodar o teclado/UI)
-            const centerY = height / 2 + (height > 768 ? 50 : -30);
-            ctx.translate(width / 2, centerY); 
+            const centerY = height / 2 + (height > 768 ? 100 : 0);
+            ctx.translate(width / 2, centerY);
             
-            const baseRadius = Math.min(width, height) * 0.45;
-            const perspectiveY = 0.35; 
+            const maxRadius = Math.min(width, height) * 0.45;
 
-            // Anel Exterior Escuro
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            // --- A) DESENHAR BÚSSOLA BASE (Igual à imagem) ---
             ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.ellipse(0, 0, baseRadius, baseRadius * perspectiveY, 0, 0, Math.PI * 2);
-            ctx.stroke();
+            
+            // Anel externo duplo
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.beginPath(); ctx.ellipse(0, 0, maxRadius + 30, (maxRadius + 30) * PERSPECTIVE, 0, 0, Math.PI * 2); ctx.stroke();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.beginPath(); ctx.ellipse(0, 0, maxRadius + 25, (maxRadius + 25) * PERSPECTIVE, 0, 0, Math.PI * 2); ctx.stroke();
 
-            // Marcadores Bússola
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-            ctx.font = '11px Inter';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('N', 0, -baseRadius * perspectiveY - 20);
-            ctx.fillText('S', 0, baseRadius * perspectiveY + 20);
-            ctx.fillText('E', baseRadius + 20, 0);
-            ctx.fillText('W', -baseRadius - 20, 0);
+            // Marcações (Ticks) da Bússola
+            for(let i = 0; i < 360; i += 2) {
+                let angle = i * Math.PI / 180;
+                let isMajor = (i % 10 === 0);
+                let r1 = maxRadius + 30;
+                let r2 = isMajor ? r1 - 10 : r1 - 5;
+                
+                let x1 = Math.cos(angle) * r1, y1 = Math.sin(angle) * r1 * PERSPECTIVE;
+                let x2 = Math.cos(angle) * r2, y2 = Math.sin(angle) * r2 * PERSPECTIVE;
+                
+                ctx.strokeStyle = isMajor ? 'rgba(255, 255, 255, 0.5)' : 'rgba(255, 255, 255, 0.2)';
+                ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+            }
 
-            // Linhas de Contorno (Wireframe Cone)
-            const contourLevels = 20;
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-            for (let i = 0; i < contourLevels; i++) {
-                const r = baseRadius * (1 - (i / contourLevels) * 0.9);
-                const y = -i * 12; 
+            // Pinos com Letras (N, S, E, W) Fidedignos
+            const compassPoints = [
+                { l: 'E', a: 0 }, { l: 'S', a: Math.PI/2 }, 
+                { l: 'W', a: Math.PI }, { l: 'N', a: Math.PI*1.5 }
+            ];
+            ctx.font = '10px Inter'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            compassPoints.forEach(pt => {
+                let x = Math.cos(pt.a) * (maxRadius + 15);
+                let y = Math.sin(pt.a) * (maxRadius + 15) * PERSPECTIVE;
+                let pinHeight = 40;
+                
+                // Haste
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y - pinHeight); ctx.stroke();
+                // Base
+                ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                ctx.beginPath(); ctx.ellipse(x, y, 2, 2*PERSPECTIVE, 0, 0, Math.PI*2); ctx.fill();
+                // Circulo topo
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath(); ctx.arc(x, y - pinHeight, 8, 0, Math.PI*2); ctx.fill();
+                // Letra preta vazada
+                ctx.fillStyle = '#151618';
+                ctx.fillText(pt.l, x, y - pinHeight + 1);
+            });
+
+            // --- B) DESENHAR TOPOGRAFIA 3D ---
+            // Desenhar de trás para a frente não é estritamente necessário num wireframe perfeito transparente,
+            // Mas faremos anéis concêntricos suaves.
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+            const numRings = 35; // Alta densidade para recriar o efeito topográfico
+            for (let r = maxRadius; r > 0; r -= maxRadius / numRings) {
                 ctx.beginPath();
-                ctx.ellipse(0, y, r, r * perspectiveY, 0, 0, Math.PI * 2);
+                for (let a = 0; a <= Math.PI * 2 + 0.1; a += 0.05) {
+                    let x = Math.cos(a) * r;
+                    let y = Math.sin(a) * r;
+                    let z = getElevation(x, y, maxRadius);
+                    let py = y * PERSPECTIVE - z;
+                    
+                    if (a === 0) ctx.moveTo(x, py);
+                    else ctx.lineTo(x, py);
+                }
                 ctx.stroke();
             }
 
-            // Eixo Y Central subtil
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            // --- C) CAMINHO TRACEJADO (Trail) ---
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([6, 6]); // Estilo tracejado
+            ctx.lineDashOffset = -globalTime * 10; // Animação subtil do caminho
             ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(0, -contourLevels * 12);
+            // Espiral que sobe a montanha
+            for(let t = 0; t <= 1; t += 0.01) {
+                let r = maxRadius * (1 - t * 0.95);
+                let a = t * Math.PI * 3 + Math.PI; // Inicia num ponto e sobe girando
+                let x = Math.cos(a) * r;
+                let y = Math.sin(a) * r;
+                let z = getElevation(x, y, maxRadius) + 2; // +2 para flutuar ligeiramente sobre as linhas
+                let py = y * PERSPECTIVE - z;
+                
+                if(t === 0) ctx.moveTo(x, py);
+                else ctx.lineTo(x, py);
+            }
             ctx.stroke();
+            ctx.setLineDash([]); // Reset
+            ctx.lineWidth = 1;
 
-            // Renderizar Planetas e Hastes
+            // --- D) PINOS DOS PLANETAS (Estilo NASA) ---
             planets.forEach(p => {
+                // Atualizar posição angular
                 if (p.targetAngle !== null) {
                     const diff = p.targetAngle - p.angle;
                     p.angle += diff * 0.04; 
                 } else {
-                    p.angle += p.speed;
+                    p.angle -= p.speed; // Rodar
                 }
 
-                const r = baseRadius * p.orbit;
-                const x = Math.cos(p.angle) * r;
-                const z = Math.sin(p.angle) * r * perspectiveY;
+                let r = maxRadius * p.orbitR;
+                let x = Math.cos(p.angle) * r;
+                let y = Math.sin(p.angle) * r;
+                let z = getElevation(x, y, maxRadius);
+                p.currentZ = z; // Guardar z atual
+
+                let pyBase = y * PERSPECTIVE - z;
+                let pinHeight = 70 + (maxRadius - r) * 0.1; // Pinos centrais mais altos
+                let pyTop = pyBase - pinHeight;
+
+                // 1. Haste do Pino (Branca/Opaca)
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(x, pyBase); ctx.lineTo(x, pyTop); ctx.stroke();
+
+                // 2. Base do Pino (Ponto na montanha)
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.beginPath(); ctx.ellipse(x, pyBase, 3, 3*PERSPECTIVE, 0, 0, Math.PI*2); ctx.fill();
+
+                // 3. Esfera do Planeta (Textura NASA)
+                let grad = ctx.createRadialGradient(x - 3, pyTop - 3, 1, x, pyTop, 10);
+                if(isGolden) {
+                    grad.addColorStop(0, '#fffbe6');
+                    grad.addColorStop(0.5, '#ffd700');
+                    grad.addColorStop(1, '#b8860b');
+                    ctx.shadowColor = 'rgba(255, 215, 0, 0.8)';
+                } else {
+                    grad.addColorStop(0, p.colorStops[0]);
+                    grad.addColorStop(1, p.colorStops[1]);
+                    ctx.shadowColor = p.colorStops[0];
+                }
                 
-                const baseY = p.yOffset; 
-                const pinHeight = 60 + (r * 0.2); // Variação subtil de altura
-                const topY = baseY - pinHeight; 
-
-                const activeColor = isGolden ? '#ffd700' : p.color;
-                const glowIntensity = isGolden ? 'rgba(255, 215, 0, 0.6)' : p.color;
-
-                // Haste
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-                ctx.lineWidth = 1.5;
-                ctx.beginPath();
-                ctx.moveTo(x, baseY + z);
-                ctx.lineTo(x, topY + z);
+                ctx.shadowBlur = 15;
+                ctx.fillStyle = grad;
+                ctx.beginPath(); ctx.arc(x, pyTop, 10, 0, Math.PI * 2); ctx.fill();
+                
+                // Remover sombra para as outras renderizações
+                ctx.shadowBlur = 0;
+                
+                // Adicionar "brilho de atmosfera" sutil (borda branca interna)
+                ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+                ctx.lineWidth = 1;
                 ctx.stroke();
-
-                // Base
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-                ctx.beginPath();
-                ctx.ellipse(x, baseY + z, 2.5, 2.5 * perspectiveY, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Esfera (Planeta)
-                ctx.fillStyle = '#ffffff';
-                ctx.shadowColor = glowIntensity;
-                ctx.shadowBlur = 20;
-                ctx.beginPath();
-                ctx.arc(x, topY + z, 4, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Halos de Cor
-                ctx.fillStyle = activeColor;
-                ctx.globalAlpha = 0.8;
-                ctx.shadowBlur = 10;
-                ctx.beginPath();
-                ctx.arc(x, topY + z, 2.5, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.globalAlpha = 1.0; // Reset
             });
 
             ctx.restore();
+            globalTime += 0.05;
             requestAnimationFrame(drawTopography);
         }
-
         drawTopography();
 
-        // --- INTERACTION LOGIC ---
-        async function startAstrologyReading() {
-            const name = document.getElementById('user-name').value.trim();
-            const dob = document.getElementById('user-dob').value;
 
-            if(!name || !dob) {
-                // Shake effect on error (simples feedback visual)
+        // --- 2. LÓGICA ASTROLÓGICA E ASTRONÓMICA ---
+
+        const ZODIAC_SIGNS = ["Carneiro", "Touro", "Gémeos", "Caranguejo", "Leão", "Virgem", "Balança", "Escorpião", "Sagitário", "Capricórnio", "Aquário", "Peixes"];
+
+        function getSunSign(day, month) {
+            if ((month == 1 && day <= 20) || (month == 12 && day >= 22)) return { eng: "capricorn", pt: "Capricórnio" };
+            if ((month == 1 && day >= 21) || (month == 2 && day <= 18)) return { eng: "aquarius", pt: "Aquário" };
+            if ((month == 2 && day >= 19) || (month == 3 && day <= 20)) return { eng: "pisces", pt: "Peixes" };
+            if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) return { eng: "aries", pt: "Carneiro" };
+            if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) return { eng: "taurus", pt: "Touro" };
+            if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) return { eng: "gemini", pt: "Gémeos" };
+            if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) return { eng: "cancer", pt: "Caranguejo" };
+            if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) return { eng: "leo", pt: "Leão" };
+            if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) return { eng: "virgo", pt: "Virgem" };
+            if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) return { eng: "libra", pt: "Balança" };
+            if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) return { eng: "scorpio", pt: "Escorpião" };
+            if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) return { eng: "sagittarius", pt: "Sagitário" };
+            return { eng: "aries", pt: "Carneiro" }; 
+        }
+
+        async function fetchDailyHoroscope(signEnglish) {
+            try {
+                const res = await fetch(`https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=${signEnglish}&day=today`);
+                const data = await res.json();
+                if (data && data.data && data.data.horoscope_data) return data.data.horoscope_data;
+                throw new Error("Erro API");
+            } catch (error) {
+                return "As órbitas estão numa fase transitória. A sua intuição será a melhor bússola hoje. Mantenha a clareza e evite reações impulsivas perante desafios financeiros.";
+            }
+        }
+
+        function calculateRealTimePlanets() {
+            if (typeof Astronomy === 'undefined') return [];
+            const date = new Date();
+            const celestialBodies = [
+                { id: 'Sun', name: 'Sol' }, { id: 'Moon', name: 'Lua' },
+                { id: 'Mercury', name: 'Mercúrio' }, { id: 'Venus', name: 'Vénus' },
+                { id: 'Mars', name: 'Marte' }, { id: 'Jupiter', name: 'Júpiter' }
+            ];
+            return celestialBodies.map(body => {
+                const ecliptic = Astronomy.Ecliptic(body.id, date);
+                const signIndex = Math.floor(ecliptic.elon / 30) % 12;
+                return { name: body.name, sign: ZODIAC_SIGNS[signIndex] };
+            });
+        }
+
+        function renderAstroGrid() {
+            const container = document.getElementById('astro-grid-container');
+            container.innerHTML = '';
+            const realPositions = calculateRealTimePlanets();
+            realPositions.forEach(pos => {
+                const card = document.createElement('div');
+                card.className = 'astro-card';
+                card.innerHTML = `<span class="planet-name">${pos.name}</span><span class="planet-sign">${pos.sign}</span>`;
+                container.appendChild(card);
+            });
+        }
+
+        async function startAstrologyReading() {
+            const nameInput = document.getElementById('user-name').value.trim();
+            const dobInput = document.getElementById('user-dob').value;
+            const btn = document.getElementById('submit-btn');
+
+            if(!nameInput || !dobInput) {
                 const panel = document.getElementById('input-panel');
-                panel.style.transform = 'translateX(-10px)';
-                setTimeout(() => panel.style.transform = 'translateX(10px)', 100);
-                setTimeout(() => panel.style.transform = 'translateX(0)', 200);
+                panel.style.transform = 'translateX(-10px)'; setTimeout(() => panel.style.transform = 'translateX(10px)', 100); setTimeout(() => panel.style.transform = 'translateX(0)', 200);
                 return;
             }
 
-            // Geração da Cor de Brilho Dinâmico
-            const isFemale = name.toLowerCase().endsWith('a'); 
+            btn.disabled = true; btn.innerText = "A Alinhar Órbitas...";
+
+            const dateObj = new Date(dobInput);
+            const userSign = getSunSign(dateObj.getUTCDate(), dateObj.getUTCMonth() + 1);
+
+            const horoscopeText = await fetchDailyHoroscope(userSign.eng);
+            renderAstroGrid();
+
+            const isFemale = nameInput.toLowerCase().endsWith('a'); 
             const root = document.documentElement;
-            // Tons neon intensos otimizados para fundos escuros
-            const themeColor = isFemale ? 'rgba(255, 41, 117, 0.25)' : 'rgba(0, 168, 255, 0.25)';
-            root.style.setProperty('--glow-color', themeColor);
+            // Cores ajustadas para brilhar de forma intensa na UI
+            root.style.setProperty('--glow-color', isFemale ? 'rgba(255, 41, 117, 0.4)' : 'rgba(0, 168, 255, 0.4)');
 
-            // Fase 1: Nascimento (Alinhamento e Cor Dourada)
+            // 1. Fase Nascimento: Planetas dourados e alinham a um ponto
             isGolden = true;
-            planets.forEach(p => {
-                p.targetAngle = p.angle + (Math.PI * 1.5); 
-            });
+            planets.forEach(p => { p.targetAngle = p.angle + (Math.PI * 1.5); });
 
-            // Ocultar Título
             const title = document.getElementById('title');
-            title.style.transform = 'translateY(-20px)';
-            title.style.opacity = '0';
+            title.style.transform = 'translateY(-20px)'; title.style.opacity = '0';
 
-            // Fase 2: Mostrar Resultados
             setTimeout(() => {
                 document.getElementById('main-ui').classList.add('ui-shifted');
                 document.getElementById('topo-canvas').classList.add('bg-shifted');
 
+                // 2. Fase Dia Atual: Retornam às cores da NASA e novo alinhamento
                 isGolden = false;
-                planets.forEach(p => {
-                    p.targetAngle = p.angle + Math.PI; 
-                });
+                planets.forEach(p => { p.targetAngle = p.angle + Math.PI; });
 
                 title.style.display = 'none';
-                
                 const inputPanel = document.getElementById('input-panel');
-                inputPanel.style.opacity = '0';
-                inputPanel.style.transform = 'scale(0.95)';
+                inputPanel.style.opacity = '0'; inputPanel.style.transform = 'scale(0.95)';
                 
                 setTimeout(() => {
                     inputPanel.style.display = 'none';
                     
-                    const readingPanel = document.getElementById('reading-panel');
-                    document.getElementById('display-name').innerText = name.charAt(0).toUpperCase() + name.slice(1);
+                    document.getElementById('display-name').innerText = nameInput.charAt(0).toUpperCase() + nameInput.slice(1);
+                    document.getElementById('display-sign').innerText = userSign.pt;
+                    document.getElementById('api-horoscope-text').innerText = horoscopeText;
                     
+                    const readingPanel = document.getElementById('reading-panel');
                     readingPanel.style.display = 'flex';
-                    // Disparo do Reflow
-                    void readingPanel.offsetWidth; 
+                    void readingPanel.offsetWidth; // Reflow
                     
                     readingPanel.style.opacity = '1';
                     readingPanel.style.transform = 'translateY(0)';
